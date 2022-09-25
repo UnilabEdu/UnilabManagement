@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 import string
 import secrets
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -23,18 +24,18 @@ def get_password():
         password += secrets.choice(symbols)
     return password
 
-def send_email_after_register(email_to,password):
+def send_email_after_register(user,password):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     import datetime
     now = datetime.datetime.now()
 
-    SERVER = 'smtp.gmail.com' # "your smtp server"
+    SERVER = os.environ.get('SMTP_SERVER') or 'smtp.gmail.com' # "your smtp server"
     PORT = 587 # your port number
-    FROM =  'unilab@gmail.com' # "your from email id"
-    TO = email_to # "your to email ids"  # can be a list
-    PASS = '***********' # "your email id's password"
+    FROM =  os.environ.get('EMAIL_ADDRESS') or 'unilab@gmail.com'
+    TO = user.email # "your to email ids"  # can be a list
+    PASS = os.environ.get('EMAIL_PASSWORD') 
 
     message = MIMEMultipart()
     message['Subject'] = 'Registration Success Message - [Automated Email]' + ' ' + str(now.day) + '-' + str(now.month) + '-' + str(
@@ -43,7 +44,9 @@ def send_email_after_register(email_to,password):
     message['From'] = FROM
     message['To'] = TO
 
-    text = 'Your registration to Unilab has been successed, Welcome \n this is your password {}'.format(password)
+    text = f'Your registration to Unilab has been successed, Welcome! \n\
+        this is your password: \n\
+            {password}'
     message.attach(MIMEText(text))
     print('Initiating Server...')
 

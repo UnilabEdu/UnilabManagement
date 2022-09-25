@@ -1,10 +1,10 @@
 from flask import Blueprint, flash, url_for, \
-    redirect, render_template, request, session
+    redirect, render_template, request, session,request
 from flask_login import logout_user, login_required, current_user,login_user
 
 from app.auth.forms import RegisterForm, LoginForm
 from app.auth.models import User
-from app.extensions import db,get_password,send_email_after_register
+from app.extensions import db,get_password,send_email_after_register 
 
 user_blueprint = Blueprint('user', __name__, template_folder="templates")
 
@@ -18,36 +18,33 @@ def registration():
     form = RegisterForm()
 
     if form.validate_on_submit():
-            email = form.email.data
-            # user = User.query.filter_by(email=email).first()
-            # print('\n\n',user,'იუზერ\n\n')
-            # if user:
-            #     flash('email exists')
-            print(request.form)
-            user = User(
-                name = form.first_name.data,
-                last_name = form.last_name.data,
-                email = email,
-                gender = form.sex.data,
-                birth_date = form.birth_date.data,
-                phone_number = form.phone_number.data,
-                passport_id = form.passport_id.data,
-                country = form.country.data,
-                city = form.city.data,
-                region = form.region.data,
-                address = form.address.data,
-                role = form.status.data,
-                password = get_password()
-            )
-            if user:
-                # sent random password to user
-                # send_email_after_register(user.email,user.password)
-                pass
+        password = get_password()
+        email = form.email.data
+        user = User(
+            name = form.first_name.data,
+            last_name = form.last_name.data,
+            email = email,
+            gender = form.sex.data,
+            birth_date = form.birth_date.data,
+            phone_number = form.phone_number.data,
+            passport_id = form.passport_id.data,
+            country = form.country.data,
+            city = form.city.data,
+            region = form.region.data,
+            address = form.address.data,
+            role = form.status.data,
+            password = password
+        )
+        try:
             db.session.add(user)
             db.session.commit()
             flash("რეგისტრაცია წარმატებით დასრულდა")
-
+            # sent random password to user
+            send_email_after_register(user,password)
+            del password
             return redirect(url_for('user.login'))
+        except Exception as e:
+                print(e)
     if form.errors != {}: #If there are not errors from the validations
         for err_message in form.errors.values():
             flash(f'There was an error with creating a user: {err_message}', category='error')
@@ -90,4 +87,3 @@ def welcome():
 #     session["logged_in"] = False
 #     return render_template("base.html")
 #
-
