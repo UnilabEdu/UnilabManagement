@@ -32,7 +32,7 @@ def registration():
             city = form.city.data,
             region = form.region.data,
             address = form.address.data,
-            role = form.status.data,
+            # TODO add role
             password = password
         )
         try:

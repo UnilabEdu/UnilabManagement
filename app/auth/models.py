@@ -1,5 +1,5 @@
 from enum import unique
-from app import db, login_manager
+from app.extensions import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -35,20 +35,22 @@ class BaseModel:
 
 
 class User(db.Model, UserMixin, BaseModel):
+    __tablename__ = 'user'
+
     id = db.Column(db.Integer, primary_key=True)
+    passport_id = db.Column(db.Integer,unique=True,index=True)
     name = db.Column(db.String(64), nullable=False, index=True)
     last_name = db.Column(db.String(64), nullable=False, index=True)
     email = db.Column(db.String(64), nullable=False, unique=True, index=True)
-    password_hash = db.Column(db.String(225))
-    gender = db.Column(db.String(64), nullable=False)
     birth_date = db.Column(db.String, nullable=False)
+    gender = db.Column(db.String(64), nullable=False)
+    password_hash = db.Column(db.String(225))
     phone_number = db.Column(db.Integer,unique=True,index=True)
-    passport_id = db.Column(db.Integer,unique=True,index=True)
     country = db.Column(db.String(64), nullable=False)
     city = db.Column(db.String(64), nullable=False)
     region = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(125), nullable=False)
-    role = db.Column(db.String(64), nullable=False)
+    role = db.relationship('Role',secondary='user_roles')
 
     school_number = db.Column(db.Integer, nullable=True)
     school_class_number = db.Column(db.Integer, nullable=True)
@@ -61,10 +63,10 @@ class User(db.Model, UserMixin, BaseModel):
     faculty = db.Column(db.String(64), nullable=True)
     program = db.Column(db.String(64), nullable=True)
 
-    def __init__(self, name, last_name, email,password,  gender,birth_date,  phone_number, passport_id, country, city,
-                    region, address, role, school_number=None, school_class_number=None, parent_name=None,
-                    parent_mobile_number=None, university=None,
-                    degree=None, education_level=None, faculty=None, program=None):
+    def __init__(self, name, last_name, email,password,  gender,birth_date,  phone_number, 
+                    passport_id, country, city, region, address, school_number=None, 
+                    school_class_number=None, parent_name=None, parent_mobile_number=None, 
+                    university=None, degree=None, education_level=None, faculty=None, program=None):
         self.name = name
         self.last_name = last_name
         self.email = email
@@ -77,7 +79,6 @@ class User(db.Model, UserMixin, BaseModel):
         self.city = city
         self.region = region
         self.address = address
-        self.role = role
         self.school_number = school_number
         self.school_class_number = school_class_number
         self.parent_name = parent_name
@@ -100,3 +101,19 @@ class User(db.Model, UserMixin, BaseModel):
     def __repr__(self):
         return f'{self.name} {self.last_name}, {self.role}, are created'
 
+class UserRoles(db.Model,BaseModel):
+    __tablename__ = 'user_roles'
+
+    id = db.Column(db.Integer,primary_key=True)
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
+    role_id = db.Column(db.Integer,db.ForeignKey('role.id'))
+
+    def __init__(self,user_id,role_id):
+        self.user_id = user_id
+        self.role_id = role_id
+
+class Role(db.Model,BaseModel):
+    __tablename__ = 'role'
+
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(24),unique=True,index=True,nullable=False)
