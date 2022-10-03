@@ -50,7 +50,7 @@ class User(db.Model, UserMixin, BaseModel):
     city = db.Column(db.String(64), nullable=False)
     region = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(125), nullable=False)
-    role = db.relationship('Role',secondary='user_roles')
+    role = db.relationship('Role',secondary='user_roles',backref='users')
 
     school_number = db.Column(db.Integer, nullable=True)
     school_class_number = db.Column(db.Integer, nullable=True)
@@ -96,10 +96,11 @@ class User(db.Model, UserMixin, BaseModel):
             return email
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash(), password)
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'{self.name} {self.last_name}, {self.role}, are created'
+        return f'{self.name} {self.last_name}, {self.role}'
+
 
 class UserRoles(db.Model,BaseModel):
     __tablename__ = 'user_roles'
@@ -117,3 +118,6 @@ class Role(db.Model,BaseModel):
 
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(24),unique=True,index=True,nullable=False)
+
+    def __repr__(self):
+        return self.name

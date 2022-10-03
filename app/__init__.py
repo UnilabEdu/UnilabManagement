@@ -5,17 +5,19 @@ from app.configs import Config, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
 from app.auth.models import User
 from app.auth.views import user_blueprint
+from app.commands.commands import init_db, create_roles
 
 
 BLUEPRINTS = [user_blueprint] 
-COMMANDS = [] 
+COMMANDS = [init_db,create_roles] 
+
 
 def create_app():
 
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # register_commands(app)
+    register_commands(app)
     register_extensions(app)
     register_blueprints(app)
     # register_admin_panel(app)
