@@ -39,4 +39,4 @@ class Subject(db.Model, BaseModel):
     name = db.Column(db.String(124), index=True)
     has_intership = db.Column(db.Boolean, default=False)
     courses = db.relationship('Courses', backref='subject')
-    # sylabus
+    sylabus = db.Column(db.String(128), nullable=True)
