@@ -2,6 +2,13 @@ import os
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
+ROLE_DICT = {
+    'admin': 1,
+    'lecturer': 2,
+    'intern': 3,
+    'student': 4
+}
+
 
 class Config(object):
 

@@ -1,5 +1,7 @@
 from app.extensions import db
-from app.auth.models import BaseModel
+from app.auth.models import BaseModel, UserRoles,User,Role
+from app.configs import ROLE_DICT
+
 
 class Courses(db.Model, BaseModel):
     __tablename__ = 'courses'
@@ -11,8 +13,12 @@ class Courses(db.Model, BaseModel):
     end_date = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean, default=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
-    students = db.relationship('User', secondary='user_courses')
-    # lecturer
+    students = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
+        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["student"]}',viewonly=True)
+
+    lecturer = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
+        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["lecturer"]}', viewonly=True)
+
 
 class UserCourses(db.Model, BaseModel):
     __tablename__ = 'user_courses'
