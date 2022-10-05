@@ -32,17 +32,20 @@ def create_roles():
 @with_appcontext
 def add_subjects():
     subjects = [
-        'Front - End', 'გრაფიკული დიზაინი', 'ICT პროექტების მართვა',
+        'Front-End', 'გრაფიკული დიზაინი', 'ICT პროექტების მართვა',
         'Python', 'ციფრული კომუნიკაციები', 'ნარატივ დიზაინი',
         'WordPress', 'PHP'
     ]
     for subject in subjects:
-        s = Subject(
-            name=subject,
-        )
-        try:
-            db.session.add(s)
-            db.session.commit()
-            click.echo('Subjects has been added')
-        except Exception as e:
-            click.echo(e)
+        s = Subject.query.filter_by(name=subject).first()
+        if not s:
+            s = Subject(
+                name=subject,
+            )
+            try:
+                db.session.add(s)
+                db.session.commit()
+                click.echo(f'{subject} has been added')
+            except Exception as e:
+                click.echo(e)
+        pass

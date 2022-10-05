@@ -9,7 +9,7 @@ class CoursesForm(FlaskForm):
     type = StringField('Course Type')
 
     announcement_date = DateField()
-    start_date = DateField('Start Date',[DataRequired()])
+    start_date = DateField('Start Date', [DataRequired()])
     end_date = DateField('End Date')
     active = BooleanField('Active')
     submit = SubmitField('Submit')
@@ -17,6 +17,6 @@ class CoursesForm(FlaskForm):
 
 class SubjectForm(FlaskForm):
 
-    name = StringField('Subject Name',[DataRequired()])
-    has_intership = BooleanField('Has Intership',)
+    name = StringField('Subject Name', [DataRequired()])
+    has_intership = BooleanField('Has Intership')
     sylabus = FileField('Sylabus', [FileAllowed(['docx', 'doc', 'odt', 'txt'])])

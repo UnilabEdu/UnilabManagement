@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.auth.models import BaseModel, UserRoles,User,Role
+from app.auth.models import BaseModel
 from app.configs import ROLE_DICT
 
 
@@ -14,7 +14,7 @@ class Courses(db.Model, BaseModel):
     active = db.Column(db.Boolean, default=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
     students = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
-        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["student"]}',viewonly=True)
+        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["student"]}', viewonly=True)
 
     lecturer = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
         secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["lecturer"]}', viewonly=True)
@@ -40,3 +40,6 @@ class Subject(db.Model, BaseModel):
     has_intership = db.Column(db.Boolean, default=False)
     courses = db.relationship('Courses', backref='subject')
     sylabus = db.Column(db.String(128), nullable=True)
+
+    def __repr__(self):
+        return self.name
