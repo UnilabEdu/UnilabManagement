@@ -1,0 +1,7 @@
+*__pycache__*
+migrations
+.venv
+.idea
+.env
+
+app/db.sqlite

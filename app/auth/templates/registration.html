@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form method="POST", class = "form">
+    {{ form.hidden_tag() }}
+              <h1 class="">Registration</h1>
+
+
+                      <div class="">
+                           {{ form.first_name.label }} {{ form.first_name(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.last_name.label }} {{ form.last_name(class = "") }}
+                       </div>
+                       <div class="">
+                        {{ form.email.label }} {{ form.email(class = "") }}
+                        </div>
+                        <div class="">
+                           {{ form.sex.label }} {{ form.sex(class = "") }}
+                       </div>
+
+
+
+                            <div class="">
+                           {{ form.phone_number.label }} {{ form.phone_number(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.passport_id.label }} {{ form.passport_id(class = "") }}
+                       </div>
+                       <div class="">
+                        {{ form.birth_date.label }} {{ form.birth_date(class = "") }}
+                        </div>
+                        <div class="">
+                           {{ form.country.label }} {{ form.country(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.region.label }} {{ form.region(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.city.label }} {{ form.city(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.address.label }} {{ form.address(class = "") }}
+                       </div>
+
+                        <div class="">
+                           {{ form.status.label }} {{ form.status(class = "") }}
+                       </div>
+
+        {{ form.submit(class = "" ) }}
+    </form>
+
+
+
+{% endblock %}
