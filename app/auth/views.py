@@ -1,12 +1,15 @@
 from flask import Blueprint, flash, url_for, \
-    redirect, render_template, request, session,request
-from flask_login import logout_user, login_required, current_user,login_user
-
+    redirect, render_template, request, session, request
+from flask_login import logout_user, login_required, current_user, login_user
 from app.auth.forms import RegisterForm, LoginForm
+from app.extensions import db, get_password, send_email_after_register 
 from app.auth.models import User
-from app.extensions import db,get_password,send_email_after_register 
+from app.configs import PROJECT_ROOT
+import os
+
 
 user_blueprint = Blueprint('user', __name__, template_folder="templates")
+
 
 @user_blueprint.route('/')
 def home():
@@ -39,6 +42,8 @@ def registration():
             db.session.add(user)
             db.session.commit()
             flash("რეგისტრაცია წარმატებით დასრულდა")
+            # create user directory in uploads/users
+            os.mkdir(os.path.join(PROJECT_ROOT, f'uploads/users/{user.id}_{user.name}_{user.last_name}'))
             # sent random password to user
             send_email_after_register(user,password)
             del password

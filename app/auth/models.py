@@ -55,7 +55,7 @@ class User(db.Model, UserMixin, BaseModel):
     school_number = db.Column(db.Integer, nullable=True)
     school_class_number = db.Column(db.Integer, nullable=True)
     parent_name = db.Column(db.String(125), nullable=True)
-    parent_mobile_number = db.Column(db.Integer)
+    parent_mobile_number = db.Column(db.Integer,nullable=True)
 
     university = db.Column(db.String(125), nullable=True)
     degree = db.Column(db.String(64), nullable=True)
