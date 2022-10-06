@@ -1,8 +1,5 @@
-from flask import Blueprint, flash, url_for, \
-    redirect, render_template, request, session, request
-from flask_login import logout_user, login_required, current_user, login_user
+from flask import Blueprint, flash, render_template, request, url_for
 from werkzeug.utils import secure_filename
-from app.extensions import db, get_password, send_email_after_register 
 from app.teaching.models import Courses, Subject, UserCourses
 from app.teaching.forms import CoursesForm, SubjectForm
 from app.configs import PROJECT_ROOT

@@ -59,23 +59,27 @@ def registration():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-                user = User.find_by_email(form.email.data)
-                session["logged_in"] = True
-
-
-                if user is not None:
-                    login_user(user)
-                    flash("მომხმარებელმა წარმატებით გაიარა ავტორიზაცია")
-
-
-                    # next = request.args.get('next')
-                    #
-                    # if next is None:
-                    #     next = url_for('unilab.main')
-                    #
-                    # return redirect(next)
+        user = User.find_by_email(form.email.data)
+        # session["logged_in"] = True
+        if user:
+            # login_user(user)
+            if user.check_password(form.password.data):
+                login_user(user, remember=form.remember.data)
+                flash("Login Successfully", category="success")
+                return redirect(url_for('user.welcome'))
+            else:
+                flash("Wrong Password - Try Again!", category="error")
+        else:
+            flash("User Doesn`t Exists! Try Again...", category='error')
+            # next = request.args.get('next')
+            #
+            # if next is None:
+            #     next = url_for('unilab.main')
+            #
+            # return redirect(next)
 
     return render_template("login.html", form = form)
+
 
 
 
@@ -92,3 +96,7 @@ def welcome():
 #     session["logged_in"] = False
 #     return render_template("base.html")
 #
+
+@user_blueprint.route("/reset_password", methods=['GET', 'POST'])
+def reset_request():
+    pass
