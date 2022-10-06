@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash
 from app.extensions import db
 from app.auth.models import User, Role
 from app.teaching.models import Subject
+from app.configs import PROJECT_ROOT
+import os
 
 
 @click.command('init_db')
@@ -39,6 +41,8 @@ def add_subjects():
     for subject in subjects:
         s = Subject.query.filter_by(name=subject).first()
         if not s:
+            # create subject directory
+            os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/subjects/{subject}'))
             s = Subject(
                 name=subject,
             )
@@ -48,4 +52,5 @@ def add_subjects():
                 click.echo(f'{subject} has been added')
             except Exception as e:
                 click.echo(e)
+            
         pass

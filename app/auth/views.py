@@ -43,7 +43,7 @@ def registration():
             db.session.commit()
             flash("რეგისტრაცია წარმატებით დასრულდა")
             # create user directory in uploads/users
-            os.mkdir(os.path.join(PROJECT_ROOT, f'uploads/users/{user.id}_{user.name}_{user.last_name}'))
+            os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/users/{user.id}_{user.name}_{user.last_name}'))
             # sent random password to user
             send_email_after_register(user,password)
             del password

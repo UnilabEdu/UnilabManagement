@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <h3 class="">Add Subject</h3>
+
+        {{ form.name.label(class="form-label") }} 
+        <br>
+        {{ form.name(class="form-control") }}
+        <br>
+        {{ form.sylabus.label(class="form-label") }} 
+        <br>
+        <input type="file" name="sylabus" class="form-control" accept=".docx, .doc, .odt, .txt"/>
+        <br>
+        {{ form.has_intership.label(class="form-label") }} 
+        <br>
+        <input type="radio" name="has_intership" value="True">True 
+        <input type="radio" name="has_intership" value="False">False
+        <br><br>
+
+        {{ form.submit(class = "btn  btn-outline-success" ) }}
+</form>
+
+
+
+{% endblock %}

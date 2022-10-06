@@ -5,10 +5,11 @@ from app.configs import Config, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
 from app.auth.models import User
 from app.auth.views import user_blueprint
+from app.teaching.views import teaching_blueprint
 from app.commands.commands import init_db, create_roles, add_subjects
 
 
-BLUEPRINTS = [user_blueprint] 
+BLUEPRINTS = [user_blueprint, teaching_blueprint] 
 COMMANDS = [init_db, create_roles, add_subjects] 
 
 

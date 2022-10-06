@@ -18,5 +18,6 @@ class CoursesForm(FlaskForm):
 class SubjectForm(FlaskForm):
 
     name = StringField('Subject Name', [DataRequired()])
-    has_intership = BooleanField('Has Intership')
+    has_intership = BooleanField('Has Intership', default=False)
     sylabus = FileField('Sylabus', [FileAllowed(['docx', 'doc', 'odt', 'txt'])])
+    submit = SubmitField('Submit')
