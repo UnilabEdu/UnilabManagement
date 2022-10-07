@@ -1,15 +1,16 @@
-from flask import Flask,render_template
+from flask import Flask
 from flask_admin import Admin
 from flask_admin.menu import MenuLink
 from app.configs import Config, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
 from app.auth.models import User
 from app.auth.views import user_blueprint
-from app.commands.commands import init_db, create_roles
+from app.teaching.views import teaching_blueprint
+from app.commands.commands import init_db, create_roles, add_subjects
 
 
-BLUEPRINTS = [user_blueprint] 
-COMMANDS = [init_db,create_roles] 
+BLUEPRINTS = [user_blueprint, teaching_blueprint] 
+COMMANDS = [init_db, create_roles, add_subjects] 
 
 
 def create_app():
@@ -23,6 +24,7 @@ def create_app():
     # register_admin_panel(app)
 
     return app
+
 
 def register_extensions(app):
 

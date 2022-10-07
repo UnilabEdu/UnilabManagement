@@ -1,5 +1,3 @@
-from sqlite3 import register_converter
-from xmlrpc.client import Boolean
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField,EmailField,PasswordField,SelectField,DateField,TelField,IntegerField,BooleanField
 from wtforms.validators import DataRequired,Email, Length,ValidationError
@@ -37,7 +35,21 @@ class RegisterForm(FlaskForm):
     region = StringField('Region',[DataRequired()])
     city = StringField('City',[DataRequired()])
     address = StringField('Address',[DataRequired()])
-    status = SelectField(u'Choose Your Status',[DataRequired()], choices=[('pupil', 'მოსწავლე'), ('student', 'სტუდენტი'), ('other', 'სხვა')])
+    status = SelectField(u'Choose Your Status',[DataRequired()], 
+        choices=[('pupil', 'მოსწავლე'), ('student', 'სტუდენტი'), ('other', 'სხვა')])
+
+    # school_number = IntegerField('School Number')
+    # school_class_number = IntegerField('School Class Number')
+    # parent_name = StringField('Parent First Name')
+    # parent_mobile_number = TelField('Parent Phone Number')
+
+    # university = StringField('university name')
+    # degree = StringField('Degree')
+    # education_level = SelectField(u'Education Level',
+    #     choices=[('1', '1'), ('2', '2'), ('3', '3'),('4','4')])
+    # faculty = StringField('Faculty')
+    # program = StringField('Program')
+
     submit = SubmitField('Create Account')
 
 
@@ -45,5 +57,4 @@ class LoginForm(FlaskForm):
     email = EmailField('Email',validators=[Email(),DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
-    # forget_password =
     submit = SubmitField("Sign in")
