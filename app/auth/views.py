@@ -89,13 +89,14 @@ def welcome():
 
     return render_template("welcome.html")
 
-# @user_blueprint.route('/logout', methods=['GET'])
-# def logout():
-#     logout_user()
-#     flash("მომხმარებელი გამოვიდა სისტემიდან")
-#     session["logged_in"] = False
-#     return render_template("base.html")
-#
+
+@user_blueprint.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    flash("მომხმარებელი გამოვიდა სისტემიდან")
+    session["logged_in"] = False
+    return render_template("base.html")
+
 
 @user_blueprint.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
