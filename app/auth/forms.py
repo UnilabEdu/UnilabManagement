@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,EmailField,PasswordField,SelectField,DateField,TelField,IntegerField,BooleanField
-from wtforms.validators import DataRequired,Email, Length,ValidationError
+from wtforms import StringField, SubmitField, EmailField, PasswordField, SelectField,\
+    DateField, TelField, BooleanField
+from wtforms.validators import DataRequired, Email, Length, ValidationError, EqualTo
 from .models import User
 
 
@@ -58,3 +59,19 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField("Sign in")
+
+
+class RequestResetForm(FlaskForm):
+    def validate_email_address(self, email):
+        email_address = User.query.filter_by(email=email.data).first()
+        if email_address is None:
+            raise ValidationError('There is no account with that email!')
+
+    email = EmailField('Email', [Email(), DataRequired()])
+    submit = SubmitField("Request Password Reset")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', [Length(min=6), DataRequired()])
+    password_confirm = PasswordField('Confirm Password', [EqualTo('password', message='Passwords Must Match!'), DataRequired()])
+    submit = SubmitField("Reset Password")

@@ -1,8 +1,9 @@
 from flask import Blueprint, flash, url_for, \
     redirect, render_template, request, session, request
 from flask_login import logout_user, login_required, current_user, login_user
-from app.auth.forms import RegisterForm, LoginForm
-from app.extensions import db, get_password, send_email_after_register , send_email
+from werkzeug.security import generate_password_hash
+from app.auth.forms import RegisterForm, LoginForm, RequestResetForm, ResetPasswordForm
+from app.extensions import db, get_password, send_email
 from app.auth.models import User
 from app.configs import PROJECT_ROOT
 import os
@@ -45,7 +46,6 @@ def registration():
             # create user directory in uploads/users
             os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/users/{user.id}_{user.name}_{user.last_name}'))
             # sent random password to user
-            # send_email_after_register(user,password)
             send_email(
                 user = user,
                 subject=f'User Registration Successful!',
@@ -56,7 +56,7 @@ def registration():
             return redirect(url_for('user.login'))
         except Exception as e:
                 print(e)
-    if form.errors != {}: #If there are not errors from the validations
+    if form.errors != {}:  #If there are not errors from the validations
         for err_message in form.errors.values():
             flash(f'There was an error with creating a user: {err_message}', category='error')
     return render_template("registration.html", form = form)
@@ -104,28 +104,41 @@ def logout():
     return render_template("base.html")
 
 
-# def send_reset_email(user):
-#     token = user.get_reset_token()
-#     msg = Message('Password Reset Request',
-#         sender='noreply@demo.com', recipients=[user.email])
-#     msg.body = f'''To reset your password, visit the following link:
-#     {url_for('auth.reset_token', token=token, _external=True)}
-
-#     If you did not make this request then simply
-#     ignore this email and no changes will be made.
-#     '''
-#     mail.send(msg)
+def send_reset_email(user):
+    token = user.get_reset_token()
+    send_email(
+        user = user,
+        subject = f'Password Reset Request',
+        text =f'''To reset your password, visit the following link:\
+            \n{url_for('user.reset_token', token=token, _external=True)}'''
+    )
 
 
 @user_blueprint.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
-    pass
-#     if current_user.is_authenticated:
-#         return redirect(url_for('auth.dashboard'))
-#     form = RequestResetForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(email=form.email.data).first()
-#         send_reset_email(user)
-#         flash('An email has been sent with instructions to reset your password.', 'info')
-#         return redirect(url_for('auth.login'))
-#     return render_template('reset_request.html', title='Reset Password', form=form)
+    if current_user.is_authenticated:
+        return render_template('welcome.html')
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('user.login'))
+    return render_template('reset_request.html',  form=form)
+
+
+@user_blueprint.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('user.welcome'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('user.reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password_hash = generate_password_hash(form.password.data)
+        db.session.commit()
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect(url_for('user.login'))
+    return render_template('reset_token.html',  form=form)
