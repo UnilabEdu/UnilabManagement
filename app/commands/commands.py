@@ -24,13 +24,15 @@ def init_db_command():
 
 def create_roles():
     for role in ['admin', 'lecturer', 'intern', 'student', 'mentor']:
-        new_role = Role(name=role)
-        try:
-            db.session.add(new_role)
-            db.session.commit()
-            click.echo(f'{role} role has been added!')
-        except Exception as e:
-            click.echo(e)
+        r = Role.query.filter_by(name=role).first()
+        if not r:
+            new_role = Role(name=role)
+            try:
+                db.session.add(new_role)
+                db.session.commit()
+                click.echo(f'{role} role has been added!')
+            except Exception as e:
+                click.echo(e)
 
 
 @click.command('create_roles')
