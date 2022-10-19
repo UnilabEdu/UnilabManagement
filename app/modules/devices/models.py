@@ -1,13 +1,14 @@
 from app.extensions import db
-from app.auth.models import BaseModel
+from app.database import BaseModel
 
-#devices
-class devices_type(db.Model, BaseModel):
+
+class DevicesType(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     devices_type = db.Column(db.String())
-    type =  db.relationship("devices_list", backref = 'worker', lazy = "dynamic" )
+    type = db.relationship("devices_list", backref='worker', lazy="dynamic")
 
-class devices_list(db.Model, BaseModel):
+
+class Device(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     devices_type = db.Column(db.String(64), db.ForeignKey("devices_type.id"))
     name = db.Column(db.String(64), nullable=False, index=True)

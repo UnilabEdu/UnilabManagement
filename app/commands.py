@@ -1,10 +1,9 @@
 import click
 from flask.cli import with_appcontext
-from werkzeug.security import generate_password_hash
 from app.extensions import db
-from app.auth.models import User, Role
-from app.teaching.models import Subject
-from app.configs import PROJECT_ROOT
+from app.modules.auth.models import User, Role
+from app.modules.teaching.models import Subject
+from app.settings import PROJECT_ROOT
 import os
 
 
@@ -20,7 +19,7 @@ def init_db():
 @click.command('create_roles')
 @with_appcontext
 def create_roles():
-    for role in ['admin','lecturer','intern','student']:
+    for role in ['admin', 'lecturer', 'intern', 'student']:
         new_role = Role(name=role)
         try:
             db.session.add(new_role)
@@ -38,6 +37,7 @@ def add_subjects():
         'Python', 'ციფრული კომუნიკაციები', 'ნარატივ დიზაინი',
         'WordPress', 'PHP'
     ]
+
     for subject in subjects:
         s = Subject.query.filter_by(name=subject).first()
         if not s:
