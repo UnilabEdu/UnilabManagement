@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_admin import Admin
 from flask_admin.menu import MenuLink
-from app.configs import Config, PROJECT_ROOT
+
+from app.settings import BaseConfig, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
-from app.auth.models import User
-from app.auth.views import user_blueprint
-from app.teaching.views import teaching_blueprint
-from app.commands.commands import init_db_command, create_roles_command, add_subjects_command
+from app.commands import init_db_command, create_roles_command, add_subjects_command
+from app.modules.auth.models import User
+from app.modules.auth.views import user_blueprint
+from app.modules.teaching.views import teaching_blueprint
+
 
 
 BLUEPRINTS = [user_blueprint, teaching_blueprint] 
@@ -16,7 +18,7 @@ COMMANDS = [init_db_command, create_roles_command, add_subjects_command]
 def create_app():
 
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(BaseConfig)
 
     register_commands(app)
     register_extensions(app)
@@ -56,11 +58,11 @@ def register_commands(app):
 
 def register_admin_panel(app):
     admin = Admin(app)
-    admin.add_view(UserView(User,db.session))
+    admin.add_view(UserView(User, db.session))
     admin.add_view(FileView(PROJECT_ROOT + '/static/uploads', name='Static Files'))
-    #https://flask-admin.readthedocs.io/en/latest/api/mod_contrib_fileadmin/
+    # https://flask-admin.readthedocs.io/en/latest/api/mod_contrib_fileadmin/
 
-    admin.add_link(MenuLink(name="Return Home",url='/'))
+    admin.add_link(MenuLink(name="Return Home", url='/'))
 
 
 

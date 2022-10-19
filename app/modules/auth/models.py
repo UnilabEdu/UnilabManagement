@@ -1,46 +1,16 @@
-from enum import unique
-from app.extensions import db, login_manager
+from app.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from app.configs import Config
-
-
-class BaseModel:
-    """
-    This Class describe SQLAlchemy DB model with Basic CRUD functionality
-
-    atribs:
-        - id: primery key
-        - create
-        - update
-        - delete
-        - save
-        - read
-    """
-
-    def create(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def update_to_db(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def delete_from_db(self):
-        db.session.delete(self)
-        db.session.commit()
+from app.settings import BaseConfig
+from app.database import BaseModel
 
 
 class User(db.Model, UserMixin, BaseModel):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    passport_id = db.Column(db.Integer,unique=True,index=True)
+    passport_id = db.Column(db.Integer, unique=True, index=True)
     name = db.Column(db.String(64), nullable=False, index=True)
     last_name = db.Column(db.String(64), nullable=False, index=True)
     email = db.Column(db.String(64), nullable=False, unique=True, index=True)
@@ -65,10 +35,11 @@ class User(db.Model, UserMixin, BaseModel):
     faculty = db.Column(db.String(64), nullable=True)
     program = db.Column(db.String(64), nullable=True)
 
-    def __init__(self, name, last_name, email,password,  gender,birth_date,  phone_number, 
-                    passport_id, country, city, region, address, school_number=None, 
-                    school_class_number=None, parent_name=None, parent_mobile_number=None, 
-                    university=None, degree=None, education_level=None, faculty=None, program=None):
+    def __init__(self, name, last_name, email, password,  gender, birth_date,  phone_number, passport_id, country, city,
+                 region, address, school_number=None, school_class_number=None, parent_name=None,
+                 parent_mobile_number=None, university=None, degree=None, education_level=None, faculty=None,
+                 program=None
+                 ):
         self.name = name
         self.last_name = last_name
         self.email = email
@@ -104,12 +75,12 @@ class User(db.Model, UserMixin, BaseModel):
         return f'{self.name} {self.last_name}, {self.role}'
 
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer(Config.SECRET_KEY, expires_sec)
+        s = Serializer(BaseConfig.SECRET_KEY, expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_token(token):
-        s = Serializer(Config.SECRET_KEY)
+        s = Serializer(BaseConfig.SECRET_KEY)
         try:
             user_id = s.loads(token)['user_id']
         except Exception as e:
@@ -118,7 +89,7 @@ class User(db.Model, UserMixin, BaseModel):
         return User.query.get(user_id)
 
 
-class UserRoles(db.Model,BaseModel):
+class UserRoles(db.Model, BaseModel):
     __tablename__ = 'user_roles'
 
     id = db.Column(db.Integer,primary_key=True)
@@ -129,11 +100,12 @@ class UserRoles(db.Model,BaseModel):
         self.user_id = user_id
         self.role_id = role_id
 
-class Role(db.Model,BaseModel):
+
+class Role(db.Model, BaseModel):
     __tablename__ = 'role'
 
-    id = db.Column(db.Integer,primary_key=True)
-    name = db.Column(db.String(24),unique=True,index=True,nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(24), unique=True, index=True, nullable=False)
 
     def __repr__(self):
         return self.name

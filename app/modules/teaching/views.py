@@ -1,9 +1,12 @@
+import os
+
 from flask import Blueprint, flash, render_template, request, url_for
 from werkzeug.utils import secure_filename
-from app.teaching.models import Courses, Subject, UserCourses
-from app.teaching.forms import CoursesForm, SubjectForm
-from app.configs import PROJECT_ROOT
-import os
+
+from app.extensions import db
+from app.settings import PROJECT_ROOT
+from app.modules.teaching.models import Courses, Subject, UserCourses
+from app.modules.teaching.forms import CoursesForm, SubjectForm
 
 
 teaching_blueprint = Blueprint('teaching', __name__, template_folder="templates")
@@ -15,7 +18,7 @@ def add_subject():
 
     if form.validate_on_submit():
         name = form.name.data
-        has_intership = form.has_intership.data
+        has_internship = form.has_internship.data
         s = Subject.query.filter_by(name=name).first()
         if s:
             flash('Subject already exists!', category='error')
@@ -23,26 +26,26 @@ def add_subject():
         # create directory for that subject
         os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/subjects/{name}'))
         try:
-            sylabus = form.sylabus.data.filename
+            syllabus = form.syllabus.data.filename
         except Exception as e:
             print(e)
-            sylabus = None
+            syllabus = None
 
-        if sylabus:
-            sylabus_name = secure_filename(form.sylabus.data.filename)
+        if syllabus:
+            syllabus_name = secure_filename(form.syllabus.data.filename)
 
-            # save sylabus in subject`s directory
-            form.sylabus.data.save(f'{PROJECT_ROOT}/static/uploads/subjects/{name}/{sylabus_name}')
-            # asign var sylabus address to save in db
-            sylabus = f'{PROJECT_ROOT}/static/uploads/subjects/{name}/{sylabus_name}'
+            # save syllabus in subject`s directory
+            form.syllabus.data.save(f'{PROJECT_ROOT}/static/uploads/subjects/{name}/{syllabus_name}')
+            # assign var syllabus address to save in db
+            syllabus = f'{PROJECT_ROOT}/static/uploads/subjects/{name}/{syllabus_name}'
 
         else:
-            sylabus = None
+            syllabus = None
         # add new subject to db
         new_subject = Subject(
             name=name,
-            has_intership=has_intership,
-            sylabus=sylabus
+            has_internship=has_internship,
+            syllabus=syllabus
         )
         try:
             db.session.add(new_subject)
@@ -50,7 +53,7 @@ def add_subject():
             flash(f'{new_subject.name} has been added in subjects.', category='success')
         except Exception as e:
             print(e)
-            flash(e, category='error')
-    return render_template('add_subject.html', form=form)
+            flash("Error while saving to the database.", category='error')
+    return render_template('teaching/add_subject.html', form=form)
 
 

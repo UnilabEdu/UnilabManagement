@@ -1,12 +1,13 @@
-from flask import Blueprint, flash, url_for, \
-    redirect, render_template, request, session, request
-from flask_login import logout_user, login_required, current_user, login_user
-from werkzeug.security import generate_password_hash
-from app.auth.forms import RegisterForm, LoginForm, RequestResetForm, ResetPasswordForm
-from app.extensions import db, get_password, send_email
-from app.auth.models import User
-from app.configs import PROJECT_ROOT
 import os
+
+from flask import Blueprint, flash, url_for, redirect, render_template, request, session, request
+from flask_login import logout_user, login_required, current_user, login_user
+
+from app.modules.auth.forms import RegisterForm, LoginForm
+from app.extensions import db
+from app.modules.auth.services import get_password, send_email_after_register
+from app.modules.auth.models import User
+from app.settings import PROJECT_ROOT
 
 
 user_blueprint = Blueprint('user', __name__, template_folder="templates")
@@ -25,19 +26,19 @@ def registration():
         password = get_password()
         email = form.email.data
         user = User(
-            name = form.first_name.data,
-            last_name = form.last_name.data,
-            email = email,
-            gender = form.sex.data,
-            birth_date = form.birth_date.data,
-            phone_number = form.phone_number.data,
-            passport_id = form.passport_id.data,
-            country = form.country.data,
-            city = form.city.data,
-            region = form.region.data,
-            address = form.address.data,
-            # TODO add role
-            password = password
+            name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=email,
+            gender=form.sex.data,
+            birth_date=form.birth_date.data,
+            phone_number=form.phone_number.data,
+            passport_id=form.passport_id.data,
+            country=form.country.data,
+            city=form.city.data,
+            region=form.region.data,
+            address=form.address.data,
+            # TODO: add role
+            password=password
         )
         try:
             db.session.add(user)
@@ -46,20 +47,21 @@ def registration():
             # create user directory in uploads/users
             os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/users/{user.id}_{user.name}_{user.last_name}'))
             # sent random password to user
-            send_email(
-                user = user,
-                subject=f'User Registration Successful!',
-                text=f'Hello {user.name}, You have successfuly registered.\
-                    \nthis is your password: {password}'
-            )
+            try:
+                send_email_after_register(user, password)
+            except Exception as e:
+                print(e)
             del password
             return redirect(url_for('user.login'))
         except Exception as e:
-                print(e)
-    if form.errors != {}:  #If there are not errors from the validations
+            print(e)
+
+    if form.errors != {}:  # If there are not errors from the validations
         for err_message in form.errors.values():
             flash(f'There was an error with creating a user: {err_message}', category='error')
-    return render_template("registration.html", form = form)
+
+    return render_template("auth/registration.html", form=form)
+
 
 @user_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
@@ -84,16 +86,14 @@ def login():
             #
             # return redirect(next)
 
-    return render_template("login.html", form = form)
-
-
+    return render_template("auth/login.html", form=form)
 
 
 @user_blueprint.route('/welcome', methods=['GET', 'POST'])
 @login_required
 def welcome():
+    return render_template("auth/welcome.html")
 
-    return render_template("welcome.html")
 
 
 @user_blueprint.route('/logout', methods=['GET'])
@@ -116,29 +116,4 @@ def send_reset_email(user):
 
 @user_blueprint.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
-    if current_user.is_authenticated:
-        return render_template('welcome.html')
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('user.login'))
-    return render_template('reset_request.html',  form=form)
-
-
-@user_blueprint.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('user.welcome'))
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('user.reset_request'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user.password_hash = generate_password_hash(form.password.data)
-        db.session.commit()
-        flash('Your password has been updated! You are now able to log in', 'success')
-        return redirect(url_for('user.login'))
-    return render_template('reset_token.html',  form=form)
+    pass
