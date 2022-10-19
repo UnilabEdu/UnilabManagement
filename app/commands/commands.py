@@ -1,3 +1,4 @@
+from operator import add
 import click
 from flask.cli import with_appcontext
 from werkzeug.security import generate_password_hash
@@ -8,8 +9,6 @@ from app.configs import PROJECT_ROOT
 import os
 
 
-@click.command('init_db')
-@with_appcontext
 def init_db():
     db.drop_all()
     db.create_all()
@@ -17,10 +16,14 @@ def init_db():
     click.echo("Created database")
 
 
-@click.command('create_roles')
+@click.command('init_db')
 @with_appcontext
+def init_db_command():
+    init_db()
+
+
 def create_roles():
-    for role in ['admin','lecturer','intern','student']:
+    for role in ['admin', 'lecturer', 'intern', 'student', 'mentor']:
         new_role = Role(name=role)
         try:
             db.session.add(new_role)
@@ -30,8 +33,12 @@ def create_roles():
             click.echo(e)
 
 
-@click.command('add_subjects')
+@click.command('create_roles')
 @with_appcontext
+def create_roles_command():
+    create_roles()
+
+
 def add_subjects():
     subjects = [
         'Front-End', 'გრაფიკული დიზაინი', 'ICT პროექტების მართვა',
@@ -54,3 +61,9 @@ def add_subjects():
                 click.echo(e)
             
         pass
+
+
+@click.command('add_subjects')
+@with_appcontext
+def add_subjects_command():
+    add_subjects()

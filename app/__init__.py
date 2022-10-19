@@ -6,11 +6,11 @@ from app.extensions import db, migrate, login_manager
 from app.auth.models import User
 from app.auth.views import user_blueprint
 from app.teaching.views import teaching_blueprint
-from app.commands.commands import init_db, create_roles, add_subjects
+from app.commands.commands import init_db_command, create_roles_command, add_subjects_command
 
 
 BLUEPRINTS = [user_blueprint, teaching_blueprint] 
-COMMANDS = [init_db, create_roles, add_subjects] 
+COMMANDS = [init_db_command, create_roles_command, add_subjects_command] 
 
 
 def create_app():
