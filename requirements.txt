@@ -20,6 +20,7 @@ Mako==1.2.2
 MarkupSafe==2.1.1
 python-dotenv==0.21.0
 SQLAlchemy==1.4.41
+tox==3.26.0
 Werkzeug==2.2.2
 WTForms==3.0.1
 zipp==3.8.1
