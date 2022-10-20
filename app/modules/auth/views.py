@@ -2,10 +2,11 @@ import os
 
 from flask import Blueprint, flash, url_for, redirect, render_template, request, session, request
 from flask_login import logout_user, login_required, current_user, login_user
+from werkzeug.security import generate_password_hash
 
-from app.modules.auth.forms import RegisterForm, LoginForm
+from app.modules.auth.forms import RegisterForm, LoginForm, RequestResetForm, ResetPasswordForm
 from app.extensions import db
-from app.modules.auth.services import get_password, send_email_after_register
+from app.modules.auth.services import get_password, send_email
 from app.modules.auth.models import User
 from app.settings import PROJECT_ROOT
 
@@ -45,10 +46,15 @@ def registration():
             db.session.commit()
             flash("რეგისტრაცია წარმატებით დასრულდა")
             # create user directory in uploads/users
-            os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/users/{user.id}_{user.name}_{user.last_name}'))
+            os.mkdir(os.path.join(PROJECT_ROOT, f'uploads/users/{user.id}_{user.name}_{user.last_name}'))
             # sent random password to user
             try:
-                send_email_after_register(user, password)
+                send_email(
+                    user = user,
+                    subject=f'User Registration Successful!',
+                    text=f'Hello {user.name}, You have successfuly registered.\
+                    \nthis is your password: {password}'
+                )
             except Exception as e:
                 print(e)
             del password
@@ -116,4 +122,29 @@ def send_reset_email(user):
 
 @user_blueprint.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
-    pass
+    if current_user.is_authenticated:
+        return render_template('welcome.html')
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('user.login'))
+    return render_template('auth/reset_request.html',  form=form)
+
+
+@user_blueprint.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('user.welcome'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('user.reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password_hash = generate_password_hash(form.password.data)
+        db.session.commit()
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect(url_for('user.login'))
+    return render_template('auth/reset_token.html',  form=form)

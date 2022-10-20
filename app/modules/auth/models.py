@@ -36,10 +36,10 @@ class User(db.Model, UserMixin, BaseModel):
     program = db.Column(db.String(64), nullable=True)
 
     def __init__(self, name, last_name, email, password,  gender, birth_date,  phone_number, passport_id, country, city,
-                 region, address, school_number=None, school_class_number=None, parent_name=None,
-                 parent_mobile_number=None, university=None, degree=None, education_level=None, faculty=None,
-                 program=None
-                 ):
+                region, address, school_number=None, school_class_number=None, parent_name=None,
+                parent_mobile_number=None, university=None, degree=None, education_level=None, faculty=None,
+                program=None
+                ):
         self.name = name
         self.last_name = last_name
         self.email = email
