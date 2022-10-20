@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form method="POST", class = "form">
+    {{ form.hidden_tag() }}
+    <div class="shadow p-3 mb-5 bg-body rounded">
+        <h1 align="center">Login</h1>
+        <form method="post">
+            {{ form.hidden_tag() }}
+    
+            {{form.email.label(class="form-label")}}
+            {{form.email(class="form-control")}}
+            <br>
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+            <br>
+            {{ form.remember.label(class="form-label") }}
+            {{ form.remember()}}
+            <br>
+            {{ form.submit(class="btn  btn-outline-success") }}  <a href="{{url_for('user.reset_request')}}">Forgot Password?</a>
+        </form>
+    </form>
+
+
+
+{% endblock %}

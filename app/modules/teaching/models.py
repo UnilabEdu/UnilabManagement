@@ -1,6 +1,6 @@
 from app.extensions import db
-from app.auth.models import BaseModel, UserRoles,User,Role
-from app.configs import ROLE_DICT
+from app.database import BaseModel
+from app.settings import ROLE_DICT
 
 
 class Courses(db.Model, BaseModel):
@@ -14,10 +14,10 @@ class Courses(db.Model, BaseModel):
     active = db.Column(db.Boolean, default=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
     students = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
-        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["student"]}',viewonly=True)
+                               secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["student"]}', viewonly=True)
 
     lecturer = db.relationship('User', secondary='join(User,UserCourses).join(UserRoles)',
-        secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["lecturer"]}', viewonly=True)
+                               secondaryjoin=f'UserRoles.role_id == {ROLE_DICT["lecturer"]}', viewonly=True)
 
 
 class UserCourses(db.Model, BaseModel):
@@ -27,7 +27,7 @@ class UserCourses(db.Model, BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     courses_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
 
-    def __init__(self,user_id,courses_id):
+    def __init__(self, user_id, courses_id):
         self.user_id = user_id
         self.role_id = courses_id
 
@@ -37,6 +37,9 @@ class Subject(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(124), index=True)
-    has_intership = db.Column(db.Boolean, default=False)
+    has_internship = db.Column(db.Boolean, default=False)
     courses = db.relationship('Courses', backref='subject')
-    # sylabus
+    syllabus = db.Column(db.String(128), nullable=True)
+
+    def __repr__(self):
+        return self.name

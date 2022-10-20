@@ -1,5 +1,6 @@
 from app.extensions import db
-from app.auth.models import BaseModel
+from app.database import BaseModel
+
 
 class ListOfContest(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
