@@ -4,14 +4,15 @@ from flask_admin.menu import MenuLink
 
 from app.settings import BaseConfig, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
-from app.commands import init_db, create_roles, add_subjects
+from app.commands import init_db_command, create_roles_command, add_subjects_command
 from app.modules.auth.models import User
 from app.modules.auth.views import user_blueprint
 from app.modules.teaching.views import teaching_blueprint
 
 
+
 BLUEPRINTS = [user_blueprint, teaching_blueprint] 
-COMMANDS = [init_db, create_roles, add_subjects] 
+COMMANDS = [init_db_command, create_roles_command, add_subjects_command] 
 
 
 def create_app():

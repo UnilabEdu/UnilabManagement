@@ -1,6 +1,8 @@
 from app.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from app.settings import BaseConfig
 from app.database import BaseModel
 
 
@@ -34,10 +36,10 @@ class User(db.Model, UserMixin, BaseModel):
     program = db.Column(db.String(64), nullable=True)
 
     def __init__(self, name, last_name, email, password,  gender, birth_date,  phone_number, passport_id, country, city,
-                 region, address, school_number=None, school_class_number=None, parent_name=None,
-                 parent_mobile_number=None, university=None, degree=None, education_level=None, faculty=None,
-                 program=None
-                 ):
+                region, address, school_number=None, school_class_number=None, parent_name=None,
+                parent_mobile_number=None, university=None, degree=None, education_level=None, faculty=None,
+                program=None
+                ):
         self.name = name
         self.last_name = last_name
         self.email = email
@@ -71,6 +73,20 @@ class User(db.Model, UserMixin, BaseModel):
 
     def __repr__(self):
         return f'{self.name} {self.last_name}, {self.role}'
+
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(BaseConfig.SECRET_KEY, expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(BaseConfig.SECRET_KEY)
+        try:
+            user_id = s.loads(token)['user_id']
+        except Exception as e:
+            print(e)
+            return None
+        return User.query.get(user_id)
 
 
 class UserRoles(db.Model, BaseModel):
