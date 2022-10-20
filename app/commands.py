@@ -1,15 +1,13 @@
+from operator import add
 import click
 from flask.cli import with_appcontext
-from werkzeug.security import generate_password_hash
 from app.extensions import db
-from app.auth.models import User, Role
-from app.teaching.models import Subject
-from app.configs import PROJECT_ROOT
+from app.modules.auth.models import User, Role
+from app.modules.teaching.models import Subject
+from app.settings import PROJECT_ROOT
 import os
 
 
-@click.command('init_db')
-@with_appcontext
 def init_db():
     db.drop_all()
     db.create_all()
@@ -17,27 +15,38 @@ def init_db():
     click.echo("Created database")
 
 
+@click.command('init_db')
+@with_appcontext
+def init_db_command():
+    init_db()
+
+
+def create_roles():
+    for role in ['admin', 'lecturer', 'intern', 'student', 'mentor']:
+        r = Role.query.filter_by(name=role).first()
+        if not r:
+            new_role = Role(name=role)
+            try:
+                db.session.add(new_role)
+                db.session.commit()
+                click.echo(f'{role} role has been added!')
+            except Exception as e:
+                click.echo(e)
+
+
 @click.command('create_roles')
 @with_appcontext
-def create_roles():
-    for role in ['admin','lecturer','intern','student']:
-        new_role = Role(name=role)
-        try:
-            db.session.add(new_role)
-            db.session.commit()
-            click.echo(f'{role} role has been added!')
-        except Exception as e:
-            click.echo(e)
+def create_roles_command():
+    create_roles()
 
 
-@click.command('add_subjects')
-@with_appcontext
 def add_subjects():
     subjects = [
         'Front-End', 'გრაფიკული დიზაინი', 'ICT პროექტების მართვა',
         'Python', 'ციფრული კომუნიკაციები', 'ნარატივ დიზაინი',
         'WordPress', 'PHP'
     ]
+
     for subject in subjects:
         s = Subject.query.filter_by(name=subject).first()
         if not s:
@@ -54,3 +63,9 @@ def add_subjects():
                 click.echo(e)
             
         pass
+
+
+@click.command('add_subjects')
+@with_appcontext
+def add_subjects_command():
+    add_subjects()
