@@ -10,10 +10,10 @@ from app.modules.hardwares.models import Hardware
 from app.modules.devices.models import DevicesType, Device
 from app.modules.auth.views import user_blueprint
 from app.modules.teaching.views import teaching_blueprint
+from app.modules.hardwares.views import hardware_blueprint
 
 
-
-BLUEPRINTS = [user_blueprint, teaching_blueprint] 
+BLUEPRINTS = [user_blueprint, teaching_blueprint, hardware_blueprint]
 COMMANDS = [init_db_command, create_roles_command, add_subjects_command] 
 
 
