@@ -50,8 +50,11 @@ def add_subjects():
     for subject in subjects:
         s = Subject.query.filter_by(name=subject).first()
         if not s:
-            # create subject directory
-            os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/subjects/{subject}'))
+            try:
+                # create subject directory
+                os.mkdir(os.path.join(PROJECT_ROOT, f'static/uploads/subjects/{subject}'))
+            except FileExistsError:
+                pass
             s = Subject(
                 name=subject,
             )

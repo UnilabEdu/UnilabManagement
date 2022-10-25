@@ -6,6 +6,8 @@ from app.settings import BaseConfig, PROJECT_ROOT
 from app.extensions import db, migrate, login_manager
 from app.commands import init_db_command, create_roles_command, add_subjects_command
 from app.modules.auth.models import User
+from app.modules.hardwares.models import Hardware
+from app.modules.devices.models import DevicesType, Device
 from app.modules.auth.views import user_blueprint
 from app.modules.teaching.views import teaching_blueprint
 
